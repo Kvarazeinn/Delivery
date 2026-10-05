@@ -25,7 +25,6 @@
 
         .container { max-width: 500px; margin: 15px auto; padding: 0 15px; }
 
-        /* التحكم بالشاشات */
         .screen { display: none; }
         .screen.active { display: block; }
 
@@ -45,13 +44,13 @@
             padding: 12px; border-radius: 8px; width: 100%; font-weight: bold; cursor: pointer; font-size: 15px;
         }
 
-        /* كرت المحل */
+        /* كروت المطاعم والمحلات */
         .store-card {
             display: flex; align-items: center; gap: 15px; cursor: pointer;
-            border: 2px solid transparent; transition: 0.2s;
+            border: 2px solid transparent; transition: 0.2s; margin-bottom: 10px;
         }
         .store-card:hover { border-color: var(--primary); }
-        .store-img { width: 60px; height: 60px; border-radius: 50%; background: #FEF08A; display: flex; align-items: center; justify-content: center; font-size: 24px; }
+        .store-img { width: 55px; height: 55px; border-radius: 50%; background: #FEF08A; display: flex; align-items: center; justify-content: center; font-size: 24px; }
 
         /* المنيو */
         .category-title { font-size: 14px; font-weight: bold; background: var(--secondary); color: #000; padding: 6px 10px; border-radius: 6px; margin: 12px 0 8px 0; }
@@ -70,15 +69,15 @@
 <body>
 
     <header>
-        <h1 id="headerTitle">دليفري القرية 🛵</h1>
+        <h1>دليفري القرية 🛵</h1>
     </header>
 
     <div class="container">
 
-        <!-- الشاشة 1: إنشاء حساب / تسجيل الدخول -->
+        <!-- الشاشة 1: تسجيل الحساب -->
         <div id="screenAuth" class="screen active">
             <div class="card">
-                <h3 style="margin-bottom: 15px; color: var(--primary);">إنشاء حساب جديد</h3>
+                <h3 style="margin-bottom: 15px; color: var(--primary);">تسجيل الدخول / إنشاء حساب</h3>
                 <div class="form-group">
                     <label>الاسم الكامل</label>
                     <input type="text" id="custName" placeholder="أدخل اسمك الكريم">
@@ -94,13 +93,15 @@
                 <button class="btn" style="background:#EFF6FF; color:#2563EB; margin-bottom:12px;" onclick="getGPS()">📍 تحديد الموقع الجغرافي (GPS)</button>
                 <input type="hidden" id="custGps">
                 <p id="gpsStatus" style="font-size:12px; color:#16A34A; margin-bottom:12px;"></p>
-                <button class="btn" onclick="registerUser()">تسجيل الدخول والمتابعة ➔</button>
+                <button class="btn" onclick="registerUser()">متابعة لرؤية المحلات ➔</button>
             </div>
         </div>
 
         <!-- الشاشة 2: قائمة المحلات والمطاعم -->
         <div id="screenStores" class="screen">
             <h3 style="margin-bottom: 12px;">اختر المحل أو المطعم:</h3>
+            
+            <!-- محل طيبة -->
             <div class="card store-card" onclick="openMenu('Taybah Crepe')">
                 <div class="store-img">🥞</div>
                 <div>
@@ -108,53 +109,70 @@
                     <p style="font-size:12px; color:#64748B;">كريب، بان كيك، حلويات ومشروبات</p>
                 </div>
             </div>
+
+            <!-- بيت المشاوي -->
+            <div class="card store-card" onclick="openMenu('بيت المشاوي')">
+                <div class="store-img">🍢</div>
+                <div>
+                    <h4>بيت المشاوي</h4>
+                    <p style="font-size:12px; color:#64748B;">مشاوي مشكلة، كباب، طاووق، وسندويشات</p>
+                </div>
+            </div>
         </div>
 
-        <!-- الشاشة 3: منيو المحل والمنتجات -->
+        <!-- الشاشة 3: منيو المحل المختار -->
         <div id="screenMenu" class="screen">
             <button onclick="showScreen('screenStores')" style="background:none; border:none; color:var(--primary); font-weight:bold; cursor:pointer; margin-bottom:10px;">➔ العودة لقائمة المحلات</button>
             
             <div class="card">
                 <h3 id="storeTitle" style="color:var(--primary); margin-bottom:10px;">منيو المحل</h3>
 
-                <!-- Extra Crepes -->
-                <div class="category-title">Extra Crepes</div>
-                <div class="menu-item">
-                    <div><h4>Lotus Tower</h4><p style="font-size:12px; color:#64748B;">330,000 L.L.</p></div>
-                    <button class="btn-add" onclick="addToCart('Lotus Tower', 330000)">+ إضافة</button>
-                </div>
-                <div class="menu-item">
-                    <div><h4>Pistachio Tower</h4><p style="font-size:12px; color:#64748B;">390,000 L.L.</p></div>
-                    <button class="btn-add" onclick="addToCart('Pistachio Tower', 390000)">+ إضافة</button>
-                </div>
-                <div class="menu-item">
-                    <div><h4>Kinder Tower</h4><p style="font-size:12px; color:#64748B;">450,000 L.L.</p></div>
-                    <button class="btn-add" onclick="addToCart('Kinder Tower', 450000)">+ إضافة</button>
+                <!-- أجزاء منيو بيت المشاوي (تظهر وتختفي برمجياً) -->
+                <div id="menuMashawi" style="display:none;">
+                    <div class="category-title">وجبات المشاوي (بالكيلو)</div>
+                    <div class="menu-item">
+                        <div><h4>كيلو مشاوي مشكل</h4><p style="font-size:12px; color:#64748B;">1,800,000 L.L.</p></div>
+                        <button class="btn-add" onclick="addToCart('كيلو مشاوي مشكل', 1800000)">+ إضافة</button>
+                    </div>
+                    <div class="menu-item">
+                        <div><h4>كيلو شيش طاووق</h4><p style="font-size:12px; color:#64748B;">1,500,000 L.L.</p></div>
+                        <button class="btn-add" onclick="addToCart('كيلو شيش طاووق', 1500000)">+ إضافة</button>
+                    </div>
+                    <div class="menu-item">
+                        <div><h4>كيلو كباب لحم</h4><p style="font-size:12px; color:#64748B;">1,600,000 L.L.</p></div>
+                        <button class="btn-add" onclick="addToCart('كيلو كباب لحم', 1600000)">+ إضافة</button>
+                    </div>
+
+                    <div class="category-title">السندويشات</div>
+                    <div class="menu-item">
+                        <div><h4>سندويش طاووق</h4><p style="font-size:12px; color:#64748B;">250,000 L.L.</p></div>
+                        <button class="btn-add" onclick="addToCart('سندويش طاووق', 250000)">+ إضافة</button>
+                    </div>
+                    <div class="menu-item">
+                        <div><h4>سندويش كباب</h4><p style="font-size:12px; color:#64748B;">270,000 L.L.</p></div>
+                        <button class="btn-add" onclick="addToCart('سندويش كباب', 270000)">+ إضافة</button>
+                    </div>
                 </div>
 
-                <!-- Special Crepes -->
-                <div class="category-title">Special Crepes</div>
-                <div class="menu-item">
-                    <div><h4>Choco Roll</h4><p style="font-size:12px; color:#64748B;">440,000 L.L.</p></div>
-                    <button class="btn-add" onclick="addToCart('Choco Roll', 440000)">+ إضافة</button>
-                </div>
-                <div class="menu-item">
-                    <div><h4>Taybah Crepe</h4><p style="font-size:12px; color:#64748B;">690,000 L.L.</p></div>
-                    <button class="btn-add" onclick="addToCart('Taybah Crepe', 690000)">+ إضافة</button>
+                <!-- منيو طيبة -->
+                <div id="menuTaybah" style="display:none;">
+                    <div class="category-title">Extra Crepes</div>
+                    <div class="menu-item">
+                        <div><h4>Lotus Tower</h4><p style="font-size:12px; color:#64748B;">330,000 L.L.</p></div>
+                        <button class="btn-add" onclick="addToCart('Lotus Tower', 330000)">+ إضافة</button>
+                    </div>
+                    <div class="menu-item">
+                        <div><h4>Taybah Crepe</h4><p style="font-size:12px; color:#64748B;">690,000 L.L.</p></div>
+                        <button class="btn-add" onclick="addToCart('Taybah Crepe', 690000)">+ إضافة</button>
+                    </div>
                 </div>
 
-                <!-- Kunafa Crepes -->
-                <div class="category-title">Kunafa Crepes</div>
-                <div class="menu-item">
-                    <div><h4>Kunafa Crepe</h4><p style="font-size:12px; color:#64748B;">400,000 L.L.</p></div>
-                    <button class="btn-add" onclick="addToCart('Kunafa Crepe', 400000)">+ إضافة</button>
-                </div>
             </div>
         </div>
 
     </div>
 
-    <!-- السلة العائمة (تظهر عند الدخول للمنيو) -->
+    <!-- السلة العائمة -->
     <div id="cartBar" class="cart-bar" style="display:none;">
         <div>
             الأصناف: <span id="cartCount" style="font-weight:bold; color:var(--primary);">0</span> | المجموع: <span id="cartTotal" style="font-weight:bold;">0</span> L.L.
@@ -163,7 +181,7 @@
     </div>
 
     <script>
-        // رقم مدير عمليات الدليفري المعتمد
+        // رقم مدير عمليات الدليفري
         const DELIVERY_MANAGER_PHONE = "96181235853";
 
         let user = {};
@@ -171,7 +189,6 @@
         let cart = [];
         let total = 0;
 
-        // التنقل بين الشاشات
         function showScreen(screenId) {
             document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
             document.getElementById(screenId).classList.add('active');
@@ -183,7 +200,6 @@
             }
         }
 
-        // إلتقاط الـ GPS
         function getGPS() {
             if (navigator.geolocation) {
                 navigator.geolocation.getCurrentPosition(pos => {
@@ -193,7 +209,6 @@
             }
         }
 
-        // تسجيل الدخول
         function registerUser() {
             let name = document.getElementById('custName').value.trim();
             let phone = document.getElementById('custPhone').value.trim();
@@ -204,24 +219,25 @@
                 return;
             }
 
-            user = {
-                name: name,
-                phone: phone,
-                area: area,
-                gps: document.getElementById('custGps').value
-            };
-
+            user = { name: name, phone: phone, area: area, gps: document.getElementById('custGps').value };
             showScreen('screenStores');
         }
 
-        // فتح المنيو
         function openMenu(storeName) {
             selectedStore = storeName;
             document.getElementById('storeTitle').innerText = "منيو " + storeName;
+            
+            // إظهار المنيو المناسب للمحل
+            document.getElementById('menuMashawi').style.display = (storeName === 'بيت المشاوي') ? 'block' : 'none';
+            document.getElementById('menuTaybah').style.display = (storeName === 'Taybah Crepe') ? 'block' : 'none';
+
+            // إعادة ضبط السلة عند التنقل بين المحلات
+            cart = [];
+            updateCart();
+
             showScreen('screenMenu');
         }
 
-        // إضافة للسلة
         function addToCart(itemName, price) {
             let found = cart.find(i => i.name === itemName);
             if (found) {
@@ -243,7 +259,6 @@
             document.getElementById('cartTotal').innerText = total.toLocaleString();
         }
 
-        // إرسال الطلب للواتساب
         function sendOrder() {
             if (cart.length === 0) {
                 alert("يرجى اختيار صنف واحد على الأقل من المنيو.");
@@ -251,7 +266,7 @@
             }
 
             let itemsList = cart.map(i => `• ${i.qty}x ${i.name} (${(i.price * i.qty).toLocaleString()} L.L.)`).join('\n');
-            let deliveryFee = 50000; // قيمة التوصيل
+            let deliveryFee = 50000;
             let grandTotal = total + deliveryFee;
 
             let msg = `🛵 *طلب دليفري جديد* - [${selectedStore}]\n` +
