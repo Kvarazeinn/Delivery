@@ -1,0 +1,259 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Taybah Crepe - خدمة الطلب السريع</title>
+    <style>
+        :root {
+            --primary-color: #6B21A8; /* الأرجواني الداكن من الهوية */
+            --secondary-color: #EAB308; /* الأصفر المميز */
+            --bg-color: #F8FAFC;
+            --card-bg: #FFFFFF;
+            --text-color: #1E293B;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: system-ui, -apple-system, sans-serif; }
+        body { background-color: var(--bg-color); color: var(--text-color); padding-bottom: 80px; }
+
+        header {
+            background: linear-gradient(135deg, var(--primary-color), #4C1D95);
+            color: white;
+            padding: 20px;
+            text-align: center;
+            border-bottom-left-radius: 20px;
+            border-bottom-right-radius: 20px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.15);
+        }
+
+        header h1 { font-size: 24px; color: var(--secondary-color); margin-bottom: 5px; }
+        header p { font-size: 14px; opacity: 0.9; }
+
+        .container { max-width: 600px; margin: 15px auto; padding: 0 15px; }
+
+        .card {
+            background: var(--card-bg);
+            border-radius: 12px;
+            padding: 15px;
+            margin-bottom: 15px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+        }
+
+        .card-title { font-size: 16px; font-weight: bold; color: var(--primary-color); margin-bottom: 12px; display: flex; align-items: center; gap: 8px; }
+
+        /* نموذج تسجيل بيانات الزبون */
+        .form-group { margin-bottom: 10px; }
+        .form-group label { display: block; font-size: 13px; font-weight: 600; margin-bottom: 4px; }
+        .form-group input, .form-group select {
+            width: 100%; padding: 10px; border: 1px solid #CBD5E1; border-radius: 8px; font-size: 14px; outline: none;
+        }
+        .btn-location {
+            background-color: #EFF6FF; color: #2563EB; border: 1px dashed #2563EB;
+            padding: 8px; border-radius: 8px; width: 100%; font-size: 13px; font-weight: 600; cursor: pointer; margin-top: 5px;
+        }
+
+        /* المنيو والمنتجات */
+        .category-title { font-size: 15px; font-weight: bold; background: var(--secondary-color); color: #000; padding: 6px 12px; border-radius: 6px; margin: 15px 0 10px 0; }
+        
+        .menu-item {
+            display: flex; justify-content: space-between; align-items: center;
+            padding: 10px 0; border-bottom: 1px solid #F1F5F9;
+        }
+        .menu-item:last-child { border-bottom: none; }
+        .item-info h4 { font-size: 14px; margin-bottom: 2px; }
+        .item-info p { font-size: 13px; color: #64748B; font-weight: bold; }
+        
+        .btn-add {
+            background-color: var(--primary-color); color: white; border: none;
+            padding: 6px 14px; border-radius: 6px; font-weight: bold; cursor: pointer;
+        }
+
+        /* السلة العائمة بالأسفل */
+        .cart-bar {
+            position: fixed; bottom: 0; left: 0; right: 0;
+            background: #FFFFFF; border-top: 1px solid #E2E8F0;
+            padding: 12px 20px; display: flex; justify-content: space-between; align-items: center;
+            box-shadow: 0 -4px 12px rgba(0,0,0,0.1); z-index: 100;
+        }
+        .cart-info { font-size: 14px; }
+        .cart-info span { font-weight: bold; color: var(--primary-color); }
+        .btn-checkout {
+            background-color: #22C55E; color: white; border: none;
+            padding: 10px 20px; border-radius: 8px; font-weight: bold; font-size: 15px; cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <h1>TAYBAH CREPE 🥞</h1>
+        <p>خدمة التوصيل السريع في القرية</p>
+    </header>
+
+    <div class="container">
+        
+        <!-- 1. نموذج معلومات الزبون والعنوان -->
+        <div class="card">
+            <div class="card-title">📍 معلومات الزبون والتوصيل</div>
+            <div class="form-group">
+                <label>الاسم الكامل</label>
+                <input type="text" id="custName" placeholder="أدخل اسمك الكريم">
+            </div>
+            <div class="form-group">
+                <label>رقم الهاتف</label>
+                <input type="tel" id="custPhone" placeholder="مثال: 70123456">
+            </div>
+            <div class="form-group">
+                <label>المنطقة / الحي</label>
+                <input type="text" id="custArea" placeholder="اسم الحي أو المَعلم القريب">
+            </div>
+            <button class="btn-location" onclick="getLocation()">📍 مشاركة موقعي الجغرافي (GPS)</button>
+            <input type="hidden" id="custGps">
+            <p id="gpsStatus" style="font-size: 11px; color: #16A34A; margin-top: 4px;"></p>
+        </div>
+
+        <!-- 2. قائمة الطعام (Taybah Menu) -->
+        <div class="card">
+            <div class="card-title">📜 قائمة المألوكولات والحلويات</div>
+
+            <!-- Extra Crepes -->
+            <div class="category-title">Extra Crepes</div>
+            <div class="menu-item">
+                <div class="item-info"><h4>Lotus Tower</h4><p>330,000 L.L.</p></div>
+                <button class="btn-add" onclick="addToCart('Lotus Tower', 330000)">+ إضافة</button>
+            </div>
+            <div class="menu-item">
+                <div class="item-info"><h4>Pistachio Tower</h4><p>390,000 L.L.</p></div>
+                <button class="btn-add" onclick="addToCart('Pistachio Tower', 390000)">+ إضافة</button>
+            </div>
+            <div class="menu-item">
+                <div class="item-info"><h4>Kinder Tower</h4><p>450,000 L.L.</p></div>
+                <button class="btn-add" onclick="addToCart('Kinder Tower', 450000)">+ إضافة</button>
+            </div>
+
+            <!-- Special Crepes -->
+            <div class="category-title">Special Crepes</div>
+            <div class="menu-item">
+                <div class="item-info"><h4>Choco Roll</h4><p>440,000 L.L.</p></div>
+                <button class="btn-add" onclick="addToCart('Choco Roll', 440000)">+ إضافة</button>
+            </div>
+            <div class="menu-item">
+                <div class="item-info"><h4>Taybah Crepe</h4><p>690,000 L.L.</p></div>
+                <button class="btn-add" onclick="addToCart('Taybah Crepe', 690000)">+ إضافة</button>
+            </div>
+
+            <!-- Kunafa Crepes -->
+            <div class="category-title">Kunafa Crepes</div>
+            <div class="menu-item">
+                <div class="item-info"><h4>Kunafa Crepe</h4><p>400,000 L.L.</p></div>
+                <button class="btn-add" onclick="addToCart('Kunafa Crepe', 400000)">+ إضافة</button>
+            </div>
+            <div class="menu-item">
+                <div class="item-info"><h4>Dubai Chocolate Crepe</h4><p>490,000 L.L.</p></div>
+                <button class="btn-add" onclick="addToCart('Dubai Chocolate Crepe', 490000)">+ إضافة</button>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- 3. شريط السلة العائم -->
+    <div class="cart-bar">
+        <div class="cart-info">
+            المنتجات: <span id="cartCount">0</span> | المجموع: <span id="cartTotal">0</span> L.L.
+        </div>
+        <button class="btn-checkout" onclick="sendOrderViaWhatsApp()">إرسال الطلب 💬</button>
+    </div>
+
+    <script>
+        // أرقام التواصل التشغيلية
+        const STORE_PHONE = "96170000000";   // رقم محلي Taybah
+        const DELIVERY_PHONE = "96171111111"; // رقم مدير الدليفري
+
+        let cart = [];
+        let totalAmount = 0;
+
+        // إضافة صنف للسلة
+        function addToCart(name, price) {
+            let existing = cart.find(item => item.name === name);
+            if (existing) {
+                existing.qty++;
+            } else {
+                cart.push({ name: name, price: price, qty: 1 });
+            }
+            updateCartUI();
+        }
+
+        // تحديث واجهة السلة
+        function updateCartUI() {
+            let count = 0;
+            totalAmount = 0;
+            cart.forEach(item => {
+                count += item.qty;
+                totalAmount += (item.price * item.qty);
+            });
+            document.getElementById('cartCount').innerText = count;
+            document.getElementById('cartTotal').innerText = totalAmount.toLocaleString();
+        }
+
+        // تحديد الموقع الجغرافي
+        function getLocation() {
+            if (navigator.geolocation) {
+                navigator.geolocation.getCurrentPosition(position => {
+                    let lat = position.coords.latitude;
+                    let lng = position.coords.longitude;
+                    document.getElementById('custGps').value = `https://maps.google.com/?q=${lat},${lng}`;
+                    document.getElementById('gpsStatus').innerText = "✓ تم التقاط الموقع بنجاح";
+                }, () => {
+                    alert("تعذر تحديد الموقع الجغرافي تلقائياً. يرجى إدخال الحي يدوياً.");
+                });
+            }
+        }
+
+        // إرسال الطلب وتوليد رابط الواتساب
+        function sendOrderViaWhatsApp() {
+            let name = document.getElementById('custName').value.trim();
+            let phone = document.getElementById('custPhone').value.trim();
+            let area = document.getElementById('custArea').value.trim();
+            let gps = document.getElementById('custGps').value;
+
+            if (!name || !phone) {
+                alert("يرجى إدخال الاسم ورقم الهاتف أولاً.");
+                return;
+            }
+
+            if (cart.length === 0) {
+                alert("السلة فارغة! يرجى اختيار الأصناف أولاً.");
+                return;
+            }
+
+            // تنسيق قائمة الطلبات
+            let itemsList = cart.map(item => `• ${item.qty}x ${item.name} (${(item.price * item.qty).toLocaleString()} L.L.)`).join('\n');
+
+            let deliveryFee = 50000; // كلفة التوصيل الافتراضية داخل القرية
+            let finalTotal = totalAmount + deliveryFee;
+
+            // بناء الرسالة المنسقة
+            let message = `🛒 *طلب جديد من الموقع - Taybah* 🥞\n` +
+                          `----------------------------------\n` +
+                          `👤 *بيانات الزبون:*\n` +
+                          `• الاسم: ${name}\n` +
+                          `• الهاتف: ${phone}\n` +
+                          `• المنطقة: ${area}\n\n` +
+                          `🏪 *تفاصيل الطلب:*\n${itemsList}\n\n` +
+                          `----------------------------------\n` +
+                          `💰 *الحساب:*\n` +
+                          `• مجموع الطلب: ${totalAmount.toLocaleString()} L.L.\n` +
+                          `• كلفة التوصيل: ${deliveryFee.toLocaleString()} L.L.\n` +
+                          `• *المبلغ الإجمالي:* *${finalTotal.toLocaleString()} L.L.*\n` +
+                          `----------------------------------\n` +
+                          (gps ? `📍 *موقع الخريطة:*\n${gps}` : '');
+
+            let encodedMsg = encodeURIComponent(message);
+            
+            // التوجيه للواتساب (يتم إرساله إلى مدير الدليفري / المحل)
+            let whatsappUrl = `https://wa.me/${DELIVERY_PHONE}?text=${encodedMsg}`;
+            window.open(whatsappUrl, '_blank');
+        }
+    </script>
+</body>
+</html>
