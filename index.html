@@ -3,257 +3,276 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Taybah Crepe - خدمة الطلب السريع</title>
+    <title>تطبيق دليفري القرية</title>
     <style>
         :root {
-            --primary-color: #6B21A8; /* الأرجواني الداكن من الهوية */
-            --secondary-color: #EAB308; /* الأصفر المميز */
-            --bg-color: #F8FAFC;
-            --card-bg: #FFFFFF;
-            --text-color: #1E293B;
+            --primary: #6B21A8;
+            --secondary: #EAB308;
+            --bg: #F8FAFC;
+            --card: #FFFFFF;
+            --text: #1E293B;
         }
 
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: system-ui, -apple-system, sans-serif; }
-        body { background-color: var(--bg-color); color: var(--text-color); padding-bottom: 80px; }
+        body { background-color: var(--bg); color: var(--text); padding-bottom: 80px; }
 
         header {
-            background: linear-gradient(135deg, var(--primary-color), #4C1D95);
-            color: white;
-            padding: 20px;
-            text-align: center;
-            border-bottom-left-radius: 20px;
-            border-bottom-right-radius: 20px;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.15);
+            background: linear-gradient(135deg, var(--primary), #4C1D95);
+            color: white; padding: 15px; text-align: center;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.1); position: sticky; top: 0; z-index: 90;
         }
+        header h1 { font-size: 20px; color: var(--secondary); }
 
-        header h1 { font-size: 24px; color: var(--secondary-color); margin-bottom: 5px; }
-        header p { font-size: 14px; opacity: 0.9; }
+        .container { max-width: 500px; margin: 15px auto; padding: 0 15px; }
 
-        .container { max-width: 600px; margin: 15px auto; padding: 0 15px; }
+        /* التحكم بالشاشات */
+        .screen { display: none; }
+        .screen.active { display: block; }
 
         .card {
-            background: var(--card-bg);
-            border-radius: 12px;
-            padding: 15px;
-            margin-bottom: 15px;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+            background: var(--card); border-radius: 12px; padding: 16px;
+            margin-bottom: 15px; box-shadow: 0 2px 8px rgba(0,0,0,0.05);
         }
 
-        .card-title { font-size: 16px; font-weight: bold; color: var(--primary-color); margin-bottom: 12px; display: flex; align-items: center; gap: 8px; }
-
-        /* نموذج تسجيل بيانات الزبون */
-        .form-group { margin-bottom: 10px; }
-        .form-group label { display: block; font-size: 13px; font-weight: 600; margin-bottom: 4px; }
-        .form-group input, .form-group select {
+        .form-group { margin-bottom: 12px; }
+        .form-group label { display: block; font-size: 13px; font-weight: bold; margin-bottom: 4px; }
+        .form-group input {
             width: 100%; padding: 10px; border: 1px solid #CBD5E1; border-radius: 8px; font-size: 14px; outline: none;
         }
-        .btn-location {
-            background-color: #EFF6FF; color: #2563EB; border: 1px dashed #2563EB;
-            padding: 8px; border-radius: 8px; width: 100%; font-size: 13px; font-weight: 600; cursor: pointer; margin-top: 5px;
+
+        .btn {
+            background-color: var(--primary); color: white; border: none;
+            padding: 12px; border-radius: 8px; width: 100%; font-weight: bold; cursor: pointer; font-size: 15px;
         }
 
-        /* المنيو والمنتجات */
-        .category-title { font-size: 15px; font-weight: bold; background: var(--secondary-color); color: #000; padding: 6px 12px; border-radius: 6px; margin: 15px 0 10px 0; }
-        
-        .menu-item {
-            display: flex; justify-content: space-between; align-items: center;
-            padding: 10px 0; border-bottom: 1px solid #F1F5F9;
+        /* كرت المحل */
+        .store-card {
+            display: flex; align-items: center; gap: 15px; cursor: pointer;
+            border: 2px solid transparent; transition: 0.2s;
         }
-        .menu-item:last-child { border-bottom: none; }
-        .item-info h4 { font-size: 14px; margin-bottom: 2px; }
-        .item-info p { font-size: 13px; color: #64748B; font-weight: bold; }
-        
-        .btn-add {
-            background-color: var(--primary-color); color: white; border: none;
-            padding: 6px 14px; border-radius: 6px; font-weight: bold; cursor: pointer;
-        }
+        .store-card:hover { border-color: var(--primary); }
+        .store-img { width: 60px; height: 60px; border-radius: 50%; background: #FEF08A; display: flex; align-items: center; justify-content: center; font-size: 24px; }
 
-        /* السلة العائمة بالأسفل */
+        /* المنيو */
+        .category-title { font-size: 14px; font-weight: bold; background: var(--secondary); color: #000; padding: 6px 10px; border-radius: 6px; margin: 12px 0 8px 0; }
+        .menu-item { display: flex; justify-content: space-between; align-items: center; padding: 10px 0; border-bottom: 1px solid #F1F5F9; }
+        .btn-add { background-color: var(--primary); color: white; border: none; padding: 6px 12px; border-radius: 6px; font-weight: bold; cursor: pointer; }
+
+        /* السلة العائمة */
         .cart-bar {
-            position: fixed; bottom: 0; left: 0; right: 0;
-            background: #FFFFFF; border-top: 1px solid #E2E8F0;
-            padding: 12px 20px; display: flex; justify-content: space-between; align-items: center;
-            box-shadow: 0 -4px 12px rgba(0,0,0,0.1); z-index: 100;
+            position: fixed; bottom: 0; left: 0; right: 0; background: #FFF;
+            border-top: 1px solid #E2E8F0; padding: 12px 20px; display: flex;
+            justify-content: space-between; align-items: center; box-shadow: 0 -4px 12px rgba(0,0,0,0.1); z-index: 100;
         }
-        .cart-info { font-size: 14px; }
-        .cart-info span { font-weight: bold; color: var(--primary-color); }
-        .btn-checkout {
-            background-color: #22C55E; color: white; border: none;
-            padding: 10px 20px; border-radius: 8px; font-weight: bold; font-size: 15px; cursor: pointer;
-        }
+        .btn-checkout { background-color: #22C55E; color: white; border: none; padding: 10px 18px; border-radius: 8px; font-weight: bold; cursor: pointer; }
     </style>
 </head>
 <body>
 
     <header>
-        <h1>TAYBAH CREPE 🥞</h1>
-        <p>خدمة التوصيل السريع في القرية</p>
+        <h1 id="headerTitle">دليفري القرية 🛵</h1>
     </header>
 
     <div class="container">
-        
-        <!-- 1. نموذج معلومات الزبون والعنوان -->
-        <div class="card">
-            <div class="card-title">📍 معلومات الزبون والتوصيل</div>
-            <div class="form-group">
-                <label>الاسم الكامل</label>
-                <input type="text" id="custName" placeholder="أدخل اسمك الكريم">
+
+        <!-- الشاشة 1: إنشاء حساب / تسجيل الدخول -->
+        <div id="screenAuth" class="screen active">
+            <div class="card">
+                <h3 style="margin-bottom: 15px; color: var(--primary);">إنشاء حساب جديد</h3>
+                <div class="form-group">
+                    <label>الاسم الكامل</label>
+                    <input type="text" id="custName" placeholder="أدخل اسمك الكريم">
+                </div>
+                <div class="form-group">
+                    <label>رقم الهاتف</label>
+                    <input type="tel" id="custPhone" placeholder="03xxxxxx">
+                </div>
+                <div class="form-group">
+                    <label>الحي / المنطقة</label>
+                    <input type="text" id="custArea" placeholder="مثال: الضيعة الفوقا">
+                </div>
+                <button class="btn" style="background:#EFF6FF; color:#2563EB; margin-bottom:12px;" onclick="getGPS()">📍 تحديد الموقع الجغرافي (GPS)</button>
+                <input type="hidden" id="custGps">
+                <p id="gpsStatus" style="font-size:12px; color:#16A34A; margin-bottom:12px;"></p>
+                <button class="btn" onclick="registerUser()">تسجيل الدخول والمتابعة ➔</button>
             </div>
-            <div class="form-group">
-                <label>رقم الهاتف</label>
-                <input type="tel" id="custPhone" placeholder="مثال: 70123456">
-            </div>
-            <div class="form-group">
-                <label>المنطقة / الحي</label>
-                <input type="text" id="custArea" placeholder="اسم الحي أو المَعلم القريب">
-            </div>
-            <button class="btn-location" onclick="getLocation()">📍 مشاركة موقعي الجغرافي (GPS)</button>
-            <input type="hidden" id="custGps">
-            <p id="gpsStatus" style="font-size: 11px; color: #16A34A; margin-top: 4px;"></p>
         </div>
 
-        <!-- 2. قائمة الطعام (Taybah Menu) -->
-        <div class="card">
-            <div class="card-title">📜 قائمة المألوكولات والحلويات</div>
+        <!-- الشاشة 2: قائمة المحلات والمطاعم -->
+        <div id="screenStores" class="screen">
+            <h3 style="margin-bottom: 12px;">اختر المحل أو المطعم:</h3>
+            <div class="card store-card" onclick="openMenu('Taybah Crepe')">
+                <div class="store-img">🥞</div>
+                <div>
+                    <h4>Taybah Crepe & Sweets</h4>
+                    <p style="font-size:12px; color:#64748B;">كريب، بان كيك، حلويات ومشروبات</p>
+                </div>
+            </div>
+        </div>
 
-            <!-- Extra Crepes -->
-            <div class="category-title">Extra Crepes</div>
-            <div class="menu-item">
-                <div class="item-info"><h4>Lotus Tower</h4><p>330,000 L.L.</p></div>
-                <button class="btn-add" onclick="addToCart('Lotus Tower', 330000)">+ إضافة</button>
-            </div>
-            <div class="menu-item">
-                <div class="item-info"><h4>Pistachio Tower</h4><p>390,000 L.L.</p></div>
-                <button class="btn-add" onclick="addToCart('Pistachio Tower', 390000)">+ إضافة</button>
-            </div>
-            <div class="menu-item">
-                <div class="item-info"><h4>Kinder Tower</h4><p>450,000 L.L.</p></div>
-                <button class="btn-add" onclick="addToCart('Kinder Tower', 450000)">+ إضافة</button>
-            </div>
+        <!-- الشاشة 3: منيو المحل والمنتجات -->
+        <div id="screenMenu" class="screen">
+            <button onclick="showScreen('screenStores')" style="background:none; border:none; color:var(--primary); font-weight:bold; cursor:pointer; margin-bottom:10px;">➔ العودة لقائمة المحلات</button>
+            
+            <div class="card">
+                <h3 id="storeTitle" style="color:var(--primary); margin-bottom:10px;">منيو المحل</h3>
 
-            <!-- Special Crepes -->
-            <div class="category-title">Special Crepes</div>
-            <div class="menu-item">
-                <div class="item-info"><h4>Choco Roll</h4><p>440,000 L.L.</p></div>
-                <button class="btn-add" onclick="addToCart('Choco Roll', 440000)">+ إضافة</button>
-            </div>
-            <div class="menu-item">
-                <div class="item-info"><h4>Taybah Crepe</h4><p>690,000 L.L.</p></div>
-                <button class="btn-add" onclick="addToCart('Taybah Crepe', 690000)">+ إضافة</button>
-            </div>
+                <!-- Extra Crepes -->
+                <div class="category-title">Extra Crepes</div>
+                <div class="menu-item">
+                    <div><h4>Lotus Tower</h4><p style="font-size:12px; color:#64748B;">330,000 L.L.</p></div>
+                    <button class="btn-add" onclick="addToCart('Lotus Tower', 330000)">+ إضافة</button>
+                </div>
+                <div class="menu-item">
+                    <div><h4>Pistachio Tower</h4><p style="font-size:12px; color:#64748B;">390,000 L.L.</p></div>
+                    <button class="btn-add" onclick="addToCart('Pistachio Tower', 390000)">+ إضافة</button>
+                </div>
+                <div class="menu-item">
+                    <div><h4>Kinder Tower</h4><p style="font-size:12px; color:#64748B;">450,000 L.L.</p></div>
+                    <button class="btn-add" onclick="addToCart('Kinder Tower', 450000)">+ إضافة</button>
+                </div>
 
-            <!-- Kunafa Crepes -->
-            <div class="category-title">Kunafa Crepes</div>
-            <div class="menu-item">
-                <div class="item-info"><h4>Kunafa Crepe</h4><p>400,000 L.L.</p></div>
-                <button class="btn-add" onclick="addToCart('Kunafa Crepe', 400000)">+ إضافة</button>
-            </div>
-            <div class="menu-item">
-                <div class="item-info"><h4>Dubai Chocolate Crepe</h4><p>490,000 L.L.</p></div>
-                <button class="btn-add" onclick="addToCart('Dubai Chocolate Crepe', 490000)">+ إضافة</button>
+                <!-- Special Crepes -->
+                <div class="category-title">Special Crepes</div>
+                <div class="menu-item">
+                    <div><h4>Choco Roll</h4><p style="font-size:12px; color:#64748B;">440,000 L.L.</p></div>
+                    <button class="btn-add" onclick="addToCart('Choco Roll', 440000)">+ إضافة</button>
+                </div>
+                <div class="menu-item">
+                    <div><h4>Taybah Crepe</h4><p style="font-size:12px; color:#64748B;">690,000 L.L.</p></div>
+                    <button class="btn-add" onclick="addToCart('Taybah Crepe', 690000)">+ إضافة</button>
+                </div>
+
+                <!-- Kunafa Crepes -->
+                <div class="category-title">Kunafa Crepes</div>
+                <div class="menu-item">
+                    <div><h4>Kunafa Crepe</h4><p style="font-size:12px; color:#64748B;">400,000 L.L.</p></div>
+                    <button class="btn-add" onclick="addToCart('Kunafa Crepe', 400000)">+ إضافة</button>
+                </div>
             </div>
         </div>
 
     </div>
 
-    <!-- 3. شريط السلة العائم -->
-    <div class="cart-bar">
-        <div class="cart-info">
-            المنتجات: <span id="cartCount">0</span> | المجموع: <span id="cartTotal">0</span> L.L.
+    <!-- السلة العائمة (تظهر عند الدخول للمنيو) -->
+    <div id="cartBar" class="cart-bar" style="display:none;">
+        <div>
+            الأصناف: <span id="cartCount" style="font-weight:bold; color:var(--primary);">0</span> | المجموع: <span id="cartTotal" style="font-weight:bold;">0</span> L.L.
         </div>
-        <button class="btn-checkout" onclick="sendOrderViaWhatsApp()">إرسال الطلب 💬</button>
+        <button class="btn-checkout" onclick="sendOrder()">إرسال الطلب 💬</button>
     </div>
 
     <script>
-        // أرقام التواصل التشغيلية
-        const STORE_PHONE = "96170000000";   // رقم محلي Taybah
-        const DELIVERY_PHONE = "96171111111"; // رقم مدير الدليفري
+        // رقم مدير عمليات الدليفري المعتمد
+        const DELIVERY_MANAGER_PHONE = "96181235853";
 
+        let user = {};
+        let selectedStore = '';
         let cart = [];
-        let totalAmount = 0;
+        let total = 0;
 
-        // إضافة صنف للسلة
-        function addToCart(name, price) {
-            let existing = cart.find(item => item.name === name);
-            if (existing) {
-                existing.qty++;
+        // التنقل بين الشاشات
+        function showScreen(screenId) {
+            document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+            document.getElementById(screenId).classList.add('active');
+            
+            if(screenId === 'screenMenu') {
+                document.getElementById('cartBar').style.display = 'flex';
             } else {
-                cart.push({ name: name, price: price, qty: 1 });
+                document.getElementById('cartBar').style.display = 'none';
             }
-            updateCartUI();
         }
 
-        // تحديث واجهة السلة
-        function updateCartUI() {
-            let count = 0;
-            totalAmount = 0;
-            cart.forEach(item => {
-                count += item.qty;
-                totalAmount += (item.price * item.qty);
-            });
-            document.getElementById('cartCount').innerText = count;
-            document.getElementById('cartTotal').innerText = totalAmount.toLocaleString();
-        }
-
-        // تحديد الموقع الجغرافي
-        function getLocation() {
+        // إلتقاط الـ GPS
+        function getGPS() {
             if (navigator.geolocation) {
-                navigator.geolocation.getCurrentPosition(position => {
-                    let lat = position.coords.latitude;
-                    let lng = position.coords.longitude;
-                    document.getElementById('custGps').value = `https://maps.google.com/?q=${lat},${lng}`;
-                    document.getElementById('gpsStatus').innerText = "✓ تم التقاط الموقع بنجاح";
-                }, () => {
-                    alert("تعذر تحديد الموقع الجغرافي تلقائياً. يرجى إدخال الحي يدوياً.");
+                navigator.geolocation.getCurrentPosition(pos => {
+                    document.getElementById('custGps').value = `https://maps.google.com/?q=${pos.coords.latitude},${pos.coords.longitude}`;
+                    document.getElementById('gpsStatus').innerText = "✓ تم حفظ موقعك الجغرافي";
                 });
             }
         }
 
-        // إرسال الطلب وتوليد رابط الواتساب
-        function sendOrderViaWhatsApp() {
+        // تسجيل الدخول
+        function registerUser() {
             let name = document.getElementById('custName').value.trim();
             let phone = document.getElementById('custPhone').value.trim();
             let area = document.getElementById('custArea').value.trim();
-            let gps = document.getElementById('custGps').value;
 
             if (!name || !phone) {
-                alert("يرجى إدخال الاسم ورقم الهاتف أولاً.");
+                alert("يرجى إدخال الاسم ورقم الهاتف للمتابعة.");
                 return;
             }
 
+            user = {
+                name: name,
+                phone: phone,
+                area: area,
+                gps: document.getElementById('custGps').value
+            };
+
+            showScreen('screenStores');
+        }
+
+        // فتح المنيو
+        function openMenu(storeName) {
+            selectedStore = storeName;
+            document.getElementById('storeTitle').innerText = "منيو " + storeName;
+            showScreen('screenMenu');
+        }
+
+        // إضافة للسلة
+        function addToCart(itemName, price) {
+            let found = cart.find(i => i.name === itemName);
+            if (found) {
+                found.qty++;
+            } else {
+                cart.push({ name: itemName, price: price, qty: 1 });
+            }
+            updateCart();
+        }
+
+        function updateCart() {
+            let count = 0;
+            total = 0;
+            cart.forEach(i => {
+                count += i.qty;
+                total += (i.price * i.qty);
+            });
+            document.getElementById('cartCount').innerText = count;
+            document.getElementById('cartTotal').innerText = total.toLocaleString();
+        }
+
+        // إرسال الطلب للواتساب
+        function sendOrder() {
             if (cart.length === 0) {
-                alert("السلة فارغة! يرجى اختيار الأصناف أولاً.");
+                alert("يرجى اختيار صنف واحد على الأقل من المنيو.");
                 return;
             }
 
-            // تنسيق قائمة الطلبات
-            let itemsList = cart.map(item => `• ${item.qty}x ${item.name} (${(item.price * item.qty).toLocaleString()} L.L.)`).join('\n');
+            let itemsList = cart.map(i => `• ${i.qty}x ${i.name} (${(i.price * i.qty).toLocaleString()} L.L.)`).join('\n');
+            let deliveryFee = 50000; // قيمة التوصيل
+            let grandTotal = total + deliveryFee;
 
-            let deliveryFee = 50000; // كلفة التوصيل الافتراضية داخل القرية
-            let finalTotal = totalAmount + deliveryFee;
+            let msg = `🛵 *طلب دليفري جديد* - [${selectedStore}]\n` +
+                      `----------------------------------\n` +
+                      `👤 *بيانات العميل:*\n` +
+                      `• الاسم: ${user.name}\n` +
+                      `• الهاتف: ${user.phone}\n` +
+                      `• المنطقة/الحي: ${user.area}\n\n` +
+                      `🏪 *تفاصيل الطلب:*\n${itemsList}\n\n` +
+                      `----------------------------------\n` +
+                      `💰 *الحساب المطلوب:*\n` +
+                      `• مجموع المواد: ${total.toLocaleString()} L.L.\n` +
+                      `• كلفة التوصيل: ${deliveryFee.toLocaleString()} L.L.\n` +
+                      `• *المبلغ الإجمالي:* *${grandTotal.toLocaleString()} L.L.*\n` +
+                      `----------------------------------\n` +
+                      (user.gps ? `📍 *الموقع على الخريطة:*\n${user.gps}` : '');
 
-            // بناء الرسالة المنسقة
-            let message = `🛒 *طلب جديد من الموقع - Taybah* 🥞\n` +
-                          `----------------------------------\n` +
-                          `👤 *بيانات الزبون:*\n` +
-                          `• الاسم: ${name}\n` +
-                          `• الهاتف: ${phone}\n` +
-                          `• المنطقة: ${area}\n\n` +
-                          `🏪 *تفاصيل الطلب:*\n${itemsList}\n\n` +
-                          `----------------------------------\n` +
-                          `💰 *الحساب:*\n` +
-                          `• مجموع الطلب: ${totalAmount.toLocaleString()} L.L.\n` +
-                          `• كلفة التوصيل: ${deliveryFee.toLocaleString()} L.L.\n` +
-                          `• *المبلغ الإجمالي:* *${finalTotal.toLocaleString()} L.L.*\n` +
-                          `----------------------------------\n` +
-                          (gps ? `📍 *موقع الخريطة:*\n${gps}` : '');
-
-            let encodedMsg = encodeURIComponent(message);
-            
-            // التوجيه للواتساب (يتم إرساله إلى مدير الدليفري / المحل)
-            let whatsappUrl = `https://wa.me/${DELIVERY_PHONE}?text=${encodedMsg}`;
-            window.open(whatsappUrl, '_blank');
+            let url = `https://wa.me/${DELIVERY_MANAGER_PHONE}?text=${encodeURIComponent(msg)}`;
+            window.open(url, '_blank');
         }
     </script>
 </body>
 </html>
+
